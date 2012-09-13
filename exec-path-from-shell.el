@@ -61,11 +61,13 @@
    "[ \t\n]*$" ""
    (shell-command-to-string (format "$SHELL --login -i -c 'echo $%s'" name))))
 
+;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
   "Set the environment variable with `NAME' to match the value seen in the user's shell."
   (interactive "sCopy value of which environment variable from shell? ")
   (setenv name (exec-path-from-shell-getenv name)))
 
+;;;###autoload
 (defun exec-path-from-shell-initialize ()
   "Set the PATH environment variable and `exec-path' to match that seen in the user's shell."
   (interactive)
