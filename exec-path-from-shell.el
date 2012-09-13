@@ -57,9 +57,11 @@
 ;;; Code:
 
 (defun exec-path-from-shell-getenv (name)
-  (replace-regexp-in-string
-   "[ \t\n]*$" ""
-   (shell-command-to-string (format "$SHELL --login -i -c 'echo $%s'" name))))
+  (with-temp-buffer
+    (call-process (getenv "SHELL") nil (current-buffer) nil
+                  "--login" "-i" "-c" (concat "echo __RESULT=$" name))
+    (when (re-search-backward "__RESULT=\\(.*\\)" nil t)
+      (match-string 1))))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
