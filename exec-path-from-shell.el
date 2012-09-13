@@ -46,7 +46,7 @@
 ;; If you use your Emacs config on other platforms, you can instead
 ;; make initialization conditional as follows:
 ;;
-;;     (when (and window-system (eq system-type 'darwin))
+;;     (when (memq window-system '(mac ns))
 ;;       (exec-path-from-shell-initialize))
 ;;
 ;; To copy the values of other environment variables, you can use
