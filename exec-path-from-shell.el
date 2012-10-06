@@ -79,9 +79,8 @@ Return the value of the environment variable."
 (defun exec-path-from-shell-initialize ()
   "Set $PATH and `exec-path' from the user's shell."
   (interactive)
-  (let ((path-from-shell (exec-path-from-shell-getenv "PATH")))
-    (setenv "PATH" path-from-shell)
-    (setq exec-path (split-string path-from-shell path-separator))))
+  (setq exec-path (split-string (exec-path-from-shell-copy-env "PATH")
+                                path-separator)))
 
 
 (provide 'exec-path-from-shell)
