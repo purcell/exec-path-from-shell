@@ -57,6 +57,10 @@
 ;;; Code:
 
 (defun exec-path-from-shell-getenv (name)
+  "Get the environment variable NAME from the user's shell.
+
+Execute $SHELL as interactive login shell, have it output the
+variable of NAME and return this output as string."
   (with-temp-buffer
     (call-process (getenv "SHELL") nil (current-buffer) nil
                   "--login" "-i" "-c" (concat "echo __RESULT=$" name))
@@ -65,13 +69,15 @@
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
-  "Set the environment variable with `NAME' to match the value seen in the user's shell."
+  "Set the environment variable $NAME from the user's shell.
+
+Return the value of the environment variable."
   (interactive "sCopy value of which environment variable from shell? ")
   (setenv name (exec-path-from-shell-getenv name)))
 
 ;;;###autoload
 (defun exec-path-from-shell-initialize ()
-  "Set the PATH environment variable and `exec-path' to match that seen in the user's shell."
+  "Set $PATH and `exec-path' from the user's shell."
   (interactive)
   (let ((path-from-shell (exec-path-from-shell-getenv "PATH")))
     (setenv "PATH" path-from-shell)
