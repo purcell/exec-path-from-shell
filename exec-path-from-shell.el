@@ -77,8 +77,12 @@ Return the value of the environment variable."
 
 ;;;###autoload
 (defun exec-path-from-shell-initialize ()
-  "Set $PATH and `exec-path' from the user's shell."
+  "Initialize environment from the user's shell.
+
+Set $MANPATH, $PATH and `exec-path' from the corresponding
+variables in the user's shell."
   (interactive)
+  (exec-path-from-shell-copy-env "MANPATH")
   (setq exec-path (split-string (exec-path-from-shell-copy-env "PATH")
                                 path-separator)))
 
