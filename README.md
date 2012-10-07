@@ -11,8 +11,8 @@ different environment than a shell in a terminal window, because OS X does not
 run a shell during the login.  Obviously this will lead to unexpected results
 when calling external utilities like `make` from Emacs.
 
-This library intends to work around this problem by copying important
-environment variables from the user's shell.
+This library works around this problem by copying important environment
+variables from the user's shell.
 
 Installation
 ------------
@@ -33,7 +33,9 @@ Add the following to your `init.el`:
 
 This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only on OS X.
 
-You can copy values of other environment variables with
+You can copy values of other environment variables by customizing
+`exec-path-from-shell-variables` before invoking
+`exec-path-from-shell-initialize`, or by calling
 `exec-path-from-shell-copy-env`, e.g.:
 
 ```scheme

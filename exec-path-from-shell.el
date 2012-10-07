@@ -56,6 +56,16 @@
 
 ;;; Code:
 
+(defgroup exec-path-from-shell nil
+  "Make Emacs use shell-defined values for $PATH etc."
+  :prefix "exec-path-from-shell-"
+  :group 'environment)
+
+(defcustom exec-path-from-shell-variables
+  '("PATH" "MANPATH")
+  "List of environment variables which are copied from the shell."
+  :group 'exec-path-from-shell)
+
 (defun exec-path-from-shell-getenv (name)
   "Get the environment variable NAME from the user's shell.
 
@@ -71,20 +81,24 @@ variable of NAME and return this output as string."
 (defun exec-path-from-shell-copy-env (name)
   "Set the environment variable $NAME from the user's shell.
 
-Return the value of the environment variable."
+As a special case, if the variable is $PATH, then `exec-path' is
+also set appropriately.  Return the value of the environment
+variable."
   (interactive "sCopy value of which environment variable from shell? ")
-  (setenv name (exec-path-from-shell-getenv name)))
+  (prog1
+      (setenv name (exec-path-from-shell-getenv name))
+    (when (string-equal "PATH" name)
+      (setq exec-path (split-string (getenv "PATH") path-separator)))))
 
 ;;;###autoload
 (defun exec-path-from-shell-initialize ()
   "Initialize environment from the user's shell.
 
-Set $MANPATH, $PATH and `exec-path' from the corresponding
-variables in the user's shell."
+The values of all the environment variables named in
+`exec-path-from-shell-variables' are set from the corresponding
+values used in the user's shell."
   (interactive)
-  (exec-path-from-shell-copy-env "MANPATH")
-  (setq exec-path (split-string (exec-path-from-shell-copy-env "PATH")
-                                path-separator)))
+  (mapc 'exec-path-from-shell-copy-env exec-path-from-shell-variables))
 
 
 (provide 'exec-path-from-shell)
