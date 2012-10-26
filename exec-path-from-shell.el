@@ -107,7 +107,8 @@ values used in the user's shell."
 ;; coding: utf-8
 ;; indent-tabs-mode: nil
 ;; mangle-whitespace: t
-;; require-final-newline: t;; eval: (checkdoc-minor-mode 1)
+;; require-final-newline: t
+;; eval: (checkdoc-minor-mode 1)
 ;; End:
 
 ;;; exec-path-from-shell.el ends here
