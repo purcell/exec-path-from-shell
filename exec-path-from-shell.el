@@ -81,14 +81,15 @@ variable of NAME and return this output as string."
 (defun exec-path-from-shell-copy-env (name)
   "Set the environment variable $NAME from the user's shell.
 
-As a special case, if the variable is $PATH, then `exec-path' is
-also set appropriately.  Return the value of the environment
-variable."
+As a special case, if the variable is $PATH, then `exec-path' and
+`eshell-path-env' are also set appropriately.  Return the value
+of the environment variable."
   (interactive "sCopy value of which environment variable from shell? ")
   (prog1
       (setenv name (exec-path-from-shell-getenv name))
     (when (string-equal "PATH" name)
-      (setq exec-path (split-string (getenv "PATH") path-separator)))))
+      (setq eshell-path-env (getenv "PATH")
+            exec-path (split-string (getenv "PATH") path-separator)))))
 
 ;;;###autoload
 (defun exec-path-from-shell-initialize ()
