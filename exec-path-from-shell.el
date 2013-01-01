@@ -62,7 +62,7 @@
   :group 'environment)
 
 (defcustom exec-path-from-shell-variables
-  '("PATH" "MANPATH")
+  '("PATH" "MANPATH" "EMAIL")
   "List of environment variables which are copied from the shell."
   :group 'exec-path-from-shell)
 
