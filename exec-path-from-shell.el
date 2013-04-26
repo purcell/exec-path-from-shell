@@ -66,16 +66,62 @@
   "List of environment variables which are copied from the shell."
   :group 'exec-path-from-shell)
 
+(defun exec-path-from-shell-echo (str)
+  "Return the result of echoing STR in the user's shell.
+
+STR is inserted literally in a double-quoted argument to echo.
+Executes $SHELL as interactive login shell."
+  (with-temp-buffer
+    (call-process (getenv "SHELL") nil (current-buffer) nil
+                  "--login" "-i" "-c" (concat "echo \"__RESULT\\0" str "\""))
+    (goto-char (point-min))
+    (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
+      (match-string 1))))
+
+(defun exec-path-from-shell-getenvs (names)
+  "Get the environment variables with NAMES from the user's shell.
+
+Execute $SHELL as interactive login shell.  The result is a list
+of (NAME . VALUE) pairs."
+  (let ((values
+         (split-string
+          (exec-path-from-shell-echo
+           (mapconcat (lambda (n) (concat "$" n)) names "\\0"))
+          "\0"))
+        result)
+    (while names
+      (prog1
+          (push (cons (car names) (car values)) result)
+        (setq values (cdr values)
+              names (cdr names))))
+   result))
+
 (defun exec-path-from-shell-getenv (name)
   "Get the environment variable NAME from the user's shell.
 
 Execute $SHELL as interactive login shell, have it output the
 variable of NAME and return this output as string."
-  (with-temp-buffer
-    (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "echo __RESULT=$" name))
-    (when (re-search-backward "__RESULT=\\(.*\\)" nil t)
-      (match-string 1))))
+  (cdr (assoc name (exec-path-from-shell-getenvs (list name)))))
+
+(defun exec-path-from-shell-setenv (name value)
+  "Set the value of environment var NAME to VALUE.
+Additionally, if NAME is \"PATH\" then also set corresponding
+variables such as `exec-path'."
+  (setenv name value)
+  (when (string-equal "PATH" name)
+    (setq eshell-path-env value
+          exec-path (split-string value path-separator))))
+
+;;;###autoload
+(defun exec-path-from-shell-copy-envs (names)
+  "Set the environment variables with NAMES from the user's shell.
+
+As a special case, if the variable is $PATH, then `exec-path' and
+`eshell-path-env' are also set appropriately.  The result is an alist,
+as described by `exec-path-from-shell-getenvs'."
+  (mapc (lambda (pair)
+          (exec-path-from-shell-setenv (car pair) (cdr pair)))
+        (exec-path-from-shell-getenvs names)))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
@@ -85,11 +131,7 @@ As a special case, if the variable is $PATH, then `exec-path' and
 `eshell-path-env' are also set appropriately.  Return the value
 of the environment variable."
   (interactive "sCopy value of which environment variable from shell? ")
-  (prog1
-      (setenv name (exec-path-from-shell-getenv name))
-    (when (string-equal "PATH" name)
-      (setq eshell-path-env (getenv "PATH")
-            exec-path (split-string (getenv "PATH") path-separator)))))
+  (cdar (exec-path-from-shell-copy-envs (list name))))
 
 ;;;###autoload
 (defun exec-path-from-shell-initialize ()
@@ -99,7 +141,7 @@ The values of all the environment variables named in
 `exec-path-from-shell-variables' are set from the corresponding
 values used in the user's shell."
   (interactive)
-  (mapc 'exec-path-from-shell-copy-env exec-path-from-shell-variables))
+  (exec-path-from-shell-copy-envs exec-path-from-shell-variables))
 
 
 (provide 'exec-path-from-shell)
