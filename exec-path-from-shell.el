@@ -73,7 +73,7 @@ STR is inserted literally in a double-quoted argument to echo.
 Executes $SHELL as interactive login shell."
   (with-temp-buffer
     (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "echo \"__RESULT\\0" str "\""))
+                  "--login" "-i" "-c" (concat "echo -e \"__RESULT\\0" str "\""))
     (goto-char (point-min))
     (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
       (match-string 1))))
