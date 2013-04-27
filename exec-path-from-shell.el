@@ -66,14 +66,17 @@
   "List of environment variables which are copied from the shell."
   :group 'exec-path-from-shell)
 
-(defun exec-path-from-shell-echo (str)
-  "Return the result of echoing STR in the user's shell.
+(defun exec-path-from-shell-printf (str)
+  "Return the result of printing STR in the user's shell.
 
-STR is inserted literally in a double-quoted argument to echo.
-Executes $SHELL as interactive login shell."
+Executes $SHELL as interactive login shell.
+
+STR is inserted literally in a double-quoted argument to printf,
+and may therefore contain backslashed escape sequences, but must not
+contain the '%' character."
   (with-temp-buffer
     (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "echo -e \"__RESULT\\0" str "\""))
+                  "--login" "-i" "-c" (concat "printf \"__RESULT\\0" str "\""))
     (goto-char (point-min))
     (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
       (match-string 1))))
@@ -85,7 +88,7 @@ Execute $SHELL as interactive login shell.  The result is a list
 of (NAME . VALUE) pairs."
   (let ((values
          (split-string
-          (exec-path-from-shell-echo
+          (exec-path-from-shell-printf
            (mapconcat (lambda (n) (concat "$" n)) names "\\0"))
           "\0"))
         result)
