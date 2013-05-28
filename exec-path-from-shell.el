@@ -76,7 +76,7 @@ and may therefore contain backslashed escape sequences, but must not
 contain the '%' character."
   (with-temp-buffer
     (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "printf \"__RESULT\\0" str "\""))
+                  "--login" "-i" "-c" (concat "printf \"__RESULT\\000" str "\""))
     (goto-char (point-min))
     (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
       (match-string 1))))
