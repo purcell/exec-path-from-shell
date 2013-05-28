@@ -76,7 +76,7 @@ and may therefore contain backslashed escape sequences, but must not
 contain the '%' character."
   (with-temp-buffer
     (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "printf \"__RESULT\\0" str "\""))
+                  "--login" "-i" "-c" (concat "printf \"__RESULT\\x00" str "\""))
     (goto-char (point-min))
     (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
       (match-string 1))))
@@ -89,7 +89,7 @@ of (NAME . VALUE) pairs."
   (let ((values
          (split-string
           (exec-path-from-shell-printf
-           (mapconcat (lambda (n) (concat "$" n)) names "\\0"))
+           (mapconcat (lambda (n) (concat "$" n)) names "\\x00"))
           "\0"))
         result)
     (while names
