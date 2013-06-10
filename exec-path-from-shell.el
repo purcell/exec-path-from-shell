@@ -89,7 +89,7 @@ of (NAME . VALUE) pairs."
   (let ((values
          (split-string
           (exec-path-from-shell-printf
-           (mapconcat (lambda (n) (concat "$" n)) names "\\0"))
+           (mapconcat (lambda (n) (concat "$" n)) names "\\000"))
           "\0"))
         result)
     (while names
