@@ -66,20 +66,25 @@
   "List of environment variables which are copied from the shell."
   :group 'exec-path-from-shell)
 
-(defun exec-path-from-shell-printf (str)
+(defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
 Executes $SHELL as interactive login shell.
 
 STR is inserted literally in a double-quoted argument to printf,
-and may therefore contain backslashed escape sequences, but must not
-contain the '%' character."
-  (with-temp-buffer
-    (call-process (getenv "SHELL") nil (current-buffer) nil
-                  "--login" "-i" "-c" (concat "printf \"__RESULT\\000" str "\""))
-    (goto-char (point-min))
-    (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
-      (match-string 1))))
+and may therefore contain backslashed escape sequences.
+
+ARGS is an optional list of args which will be inserted by printf
+in place of any % placeholders in STR. ARGS are not automatically
+shell-escaped, so that may contain $ etc."
+  (let ((printf-command (concat "printf \"__RESULT\\000" str "\" "
+                                (mapconcat #'identity args " "))))
+    (with-temp-buffer
+      (call-process (getenv "SHELL") nil (current-buffer) nil
+                    "--login" "-i" "-c" printf-command)
+      (goto-char (point-min))
+      (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
+        (match-string 1)))))
 
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
@@ -89,7 +94,8 @@ of (NAME . VALUE) pairs."
   (let ((values
          (split-string
           (exec-path-from-shell-printf
-           (mapconcat (lambda (n) (concat "$" n)) names "\\000"))
+           (mapconcat #'identity (make-list (length names) "%s") "\\000")
+           (mapcar (lambda (n) (concat "$" n)) names))
           "\0"))
         result)
     (while names
