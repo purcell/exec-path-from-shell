@@ -79,7 +79,9 @@ ARGS is an optional list of args which will be inserted by printf
 in place of any % placeholders in STR.  ARGS are not automatically
 shell-escaped, so that may contain $ etc."
   (let ((printf-command (concat "printf '__RESULT\\000" str "' "
-                                (mapconcat #'identity args " "))))
+                                (mapconcat (lambda (a) (concat "\"" a "\""))
+                                           args
+                                           " "))))
     (with-temp-buffer
       (call-process (getenv "SHELL") nil (current-buffer) nil
                     "--login" "-i" "-c" printf-command)
