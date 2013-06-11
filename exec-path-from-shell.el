@@ -66,6 +66,10 @@
   "List of environment variables which are copied from the shell."
   :group 'exec-path-from-shell)
 
+(defun exec-path-from-shell--double-quote (s)
+  "Double-quote S, escaping any double-quotes already contained in it."
+  (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
+
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
@@ -77,11 +81,10 @@ by printf.
 
 ARGS is an optional list of args which will be inserted by printf
 in place of any % placeholders in STR.  ARGS are not automatically
-shell-escaped, so that may contain $ etc."
-  (let ((printf-command (concat "printf '__RESULT\\000" str "' "
-                                (mapconcat (lambda (a) (concat "\"" a "\""))
-                                           args
-                                           " "))))
+shell-escaped, so they may contain $ etc."
+  (let ((printf-command
+         (concat "printf '__RESULT\\000" str "' "
+                 (mapconcat #'exec-path-from-shell--double-quote args " "))))
     (with-temp-buffer
       (call-process (getenv "SHELL") nil (current-buffer) nil
                     "--login" "-i" "-c" printf-command)
