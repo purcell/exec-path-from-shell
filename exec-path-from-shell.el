@@ -1,4 +1,4 @@
-;;; exec-path-from-shell.el --- Make Emacs use the $PATH set up by the user's shell
+;;; exec-path-from-shell.el --- Get environment variables such as $PATH from the shell
 
 ;; Copyright (C) 2012 Steve Purcell
 
@@ -33,6 +33,9 @@
 ;; from the shell path, so that `shell-command', `compile' and the
 ;; like work as expected.
 
+;; It also allows other environment variables to be retrieved from the
+;; shell, so that Emacs will see the same values you get in a terminal.
+
 ;; Installation:
 
 ;; ELPA packages are available on Marmalade and Melpa. Alternatively, place
@@ -43,14 +46,17 @@
 ;;     (require 'exec-path-from-shell) ;; if not using the ELPA package
 ;;     (exec-path-from-shell-initialize)
 ;;
+;; Customize `exec-path-from-shell-variables' to modify the list of
+;; variables imported.
+;;
 ;; If you use your Emacs config on other platforms, you can instead
 ;; make initialization conditional as follows:
 ;;
 ;;     (when (memq window-system '(mac ns))
 ;;       (exec-path-from-shell-initialize))
 ;;
-;; To copy the values of other environment variables, you can use
-;; `exec-path-from-shell-copy-env', e.g.
+;; Alternatively, you can use `exec-path-from-shell-copy-envs' or
+;; `exec-path-from-shell-copy-env' directly, e.g.
 ;;
 ;;     (exec-path-from-shell-copy-env "PYTHONPATH")
 
