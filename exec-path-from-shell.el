@@ -76,6 +76,10 @@
   "Double-quote S, escaping any double-quotes already contained in it."
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
+(defun exec-path-from-shell--login-arg (shell)
+  "Return the name of the --login arg for SHELL."
+  (if (string-match "tcsh$" shell) "-d" "-l"))
+
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
@@ -92,8 +96,10 @@ shell-escaped, so they may contain $ etc."
          (concat "printf '__RESULT\\000" str "' "
                  (mapconcat #'exec-path-from-shell--double-quote args " "))))
     (with-temp-buffer
-      (call-process (getenv "SHELL") nil (current-buffer) nil
-                    "--login" "-i" "-c" printf-command)
+      (let ((shell (getenv "SHELL")))
+        (call-process shell nil (current-buffer) nil
+                      (exec-path-from-shell--login-arg shell)
+                      "-i" "-c" printf-command))
       (goto-char (point-min))
       (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
         (match-string 1)))))
