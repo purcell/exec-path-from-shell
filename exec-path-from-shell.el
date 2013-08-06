@@ -92,8 +92,13 @@ shell-escaped, so they may contain $ etc."
          (concat "printf '__RESULT\\000" str "' "
                  (mapconcat #'exec-path-from-shell--double-quote args " "))))
     (with-temp-buffer
-      (call-process (getenv "SHELL") nil (current-buffer) nil
-                    "--login" "-i" "-c" printf-command)
+      (let ((shell-path (getenv "SHELL")))
+           (call-process shell-path nil (current-buffer) nil
+                         (if (string-match "tcsh$" shell-path) "-d" "-l")
+                         ; "-d" (tcsh) or "-l" (bash and zsh) - read dotfiles as if login shell
+                         "-i" ; run as if interactive
+                         "-c" ; execute following arg as command immediately
+                         printf-command))
       (goto-char (point-min))
       (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
         (match-string 1)))))
