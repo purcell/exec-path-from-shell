@@ -92,9 +92,11 @@ by printf.
 ARGS is an optional list of args which will be inserted by printf
 in place of any % placeholders in STR.  ARGS are not automatically
 shell-escaped, so they may contain $ etc."
-  (let ((printf-command
-         (concat "printf '__RESULT\\000" str "' "
-                 (mapconcat #'exec-path-from-shell--double-quote args " "))))
+  (let* ((printf-bin (or (executable-find "printf") "printf"))
+         (printf-command
+          (concat printf-bin
+                  " '__RESULT\\000" str "' "
+                  (mapconcat #'exec-path-from-shell--double-quote args " "))))
     (with-temp-buffer
       (let ((shell (getenv "SHELL")))
         (call-process shell nil (current-buffer) nil
