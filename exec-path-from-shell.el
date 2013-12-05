@@ -76,9 +76,12 @@
   "Double-quote S, escaping any double-quotes already contained in it."
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
+(defun exec-path-from-shell--tcsh-p (shell)
+  (string-match "tcsh$" shell))
+
 (defun exec-path-from-shell--login-arg (shell)
   "Return the name of the --login arg for SHELL."
-  (if (string-match "tcsh$" shell) "-d" "-l"))
+  (if (exec-path-from-shell--tcsh-p shell) "-d" "-l"))
 
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
@@ -111,19 +114,23 @@ shell-escaped, so they may contain $ etc."
 
 Execute $SHELL as interactive login shell.  The result is a list
 of (NAME . VALUE) pairs."
-  (let ((values
-         (split-string
-          (exec-path-from-shell-printf
-           (mapconcat #'identity (make-list (length names) "%s") "\\000")
-           (mapcar (lambda (n) (concat "$" n)) names))
-          "\0"))
-        result)
-    (while names
-      (prog1
-          (push (cons (car names) (car values)) result)
-        (setq values (cdr values)
-              names (cdr names))))
-   result))
+  (let* ((dollar-names (mapcar (lambda (n) (concat "$" n)) names))
+         (values (if (exec-path-from-shell--tcsh-p (getenv "SHELL"))
+                     ;; Dumb shell
+                     (mapcar (lambda (v)
+                               (exec-path-from-shell-printf "%s" (list v)))
+                             dollar-names)
+                   ;; Decent shell
+                   (split-string (exec-path-from-shell-printf
+                                  (mapconcat #'identity (make-list (length names) "%s") "\\000")
+                                  dollar-names) "\0"))))
+    (let (result)
+      (while names
+        (prog1
+            (push (cons (car names) (car values)) result)
+          (setq values (cdr values)
+                names (cdr names))))
+      result)))
 
 (defun exec-path-from-shell-getenv (name)
   "Get the environment variable NAME from the user's shell.
