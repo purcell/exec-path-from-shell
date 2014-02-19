@@ -146,7 +146,7 @@ variables such as `exec-path'."
   (setenv name value)
   (when (string-equal "PATH" name)
     (setq eshell-path-env value
-          exec-path (parse-colon-path value))))
+          exec-path (append (parse-colon-path value) (list exec-directory)))))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-envs (names)
