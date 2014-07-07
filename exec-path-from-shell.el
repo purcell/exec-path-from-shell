@@ -70,6 +70,7 @@
 (defcustom exec-path-from-shell-variables
   '("PATH" "MANPATH")
   "List of environment variables which are copied from the shell."
+  :type '(repeat (string :tag "Environment variable"))
   :group 'exec-path-from-shell)
 
 (defun exec-path-from-shell--double-quote (s)
