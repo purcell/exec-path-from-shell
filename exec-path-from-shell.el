@@ -84,6 +84,14 @@
   "Return the name of the --login arg for SHELL."
   (if (exec-path-from-shell--tcsh-p shell) "-d" "-l"))
 
+(defcustom exec-path-from-shell-arguments
+  (list (exec-path-from-shell--login-arg (getenv "SHELL")) "-i")
+  "Additional arguments to pass to the shell.
+
+The default value denotes an interactive login shell."
+  :type '(repeat (string :tag "Shell argument"))
+  :group 'exec-path-from-shell)
+
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
@@ -100,12 +108,12 @@ shell-escaped, so they may contain $ etc."
          (printf-command
           (concat printf-bin
                   " '__RESULT\\000" str "' "
-                  (mapconcat #'exec-path-from-shell--double-quote args " "))))
+                  (mapconcat #'exec-path-from-shell--double-quote args " ")))
+         (shell-args (append exec-path-from-shell-arguments
+                             (list "-c" printf-command))))
     (with-temp-buffer
-      (let ((shell (getenv "SHELL")))
-        (call-process shell nil (current-buffer) nil
-                      (exec-path-from-shell--login-arg shell)
-                      "-i" "-c" printf-command))
+      (apply #'call-process
+             (getenv "SHELL") nil (current-buffer) nil shell-args)
       (goto-char (point-min))
       (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
         (match-string 1)))))
@@ -113,8 +121,8 @@ shell-escaped, so they may contain $ etc."
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
 
-Execute $SHELL as interactive login shell.  The result is a list
-of (NAME . VALUE) pairs."
+Execute $SHELL according to `exec-path-from-shell-arguments'.
+The result is a list of (NAME . VALUE) pairs."
   (let* ((dollar-names (mapcar (lambda (n) (concat "$" n)) names))
          (values (if (exec-path-from-shell--tcsh-p (getenv "SHELL"))
                      ;; Dumb shell
