@@ -115,8 +115,9 @@ shell-escaped, so they may contain $ etc."
       (apply #'call-process
              (getenv "SHELL") nil (current-buffer) nil shell-args)
       (goto-char (point-min))
-      (when (re-search-forward "__RESULT\0\\(.*\\)" nil t)
-        (match-string 1)))))
+      (if (re-search-forward "__RESULT\0\\(.*\\)" nil t)
+          (match-string 1)
+        (error "Expected printf output from shell, but got: %s" (buffer-string))))))
 
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
