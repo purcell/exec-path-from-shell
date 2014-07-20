@@ -124,6 +124,7 @@ shell-escaped, so they may contain $ etc."
     (with-temp-buffer
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
       (let ((exit-code (apply #'call-process shell nil t nil shell-args)))
+        (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
         (unless (zerop exit-code)
           (error "Non-zero exit code from shell %s invoked with args %S" shell shell-args)))
       (goto-char (point-min))
