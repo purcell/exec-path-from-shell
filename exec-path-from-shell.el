@@ -73,11 +73,15 @@
   :type '(repeat (string :tag "Environment variable"))
   :group 'exec-path-from-shell)
 
+(defvar exec-path-from-shell-debug nil
+  "Display debug info when non-nil.")
+
 (defun exec-path-from-shell--double-quote (s)
   "Double-quote S, escaping any double-quotes already contained in it."
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
 (defun exec-path-from-shell--tcsh-p (shell)
+  "Return non-nil if SHELL appears to be tcsh."
   (string-match "tcsh$" shell))
 
 (defun exec-path-from-shell--login-arg (shell)
@@ -91,6 +95,11 @@
 The default value denotes an interactive login shell."
   :type '(repeat (string :tag "Shell argument"))
   :group 'exec-path-from-shell)
+
+(defun exec-path-from-shell--debug (msg &rest args)
+  "Print MSG and ARGS like `message', but only if debug output is enabled."
+  (when exec-path-from-shell-debug
+    (apply 'message msg args)))
 
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
@@ -110,14 +119,17 @@ shell-escaped, so they may contain $ etc."
                   " '__RESULT\\000" str "' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
          (shell-args (append exec-path-from-shell-arguments
-                             (list "-c" printf-command))))
+                             (list "-c" printf-command)))
+         (shell (getenv "SHELL")))
     (with-temp-buffer
-      (apply #'call-process
-             (getenv "SHELL") nil (current-buffer) nil shell-args)
+      (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
+      (let ((exit-code (apply #'call-process shell nil t nil shell-args)))
+        (unless (zerop exit-code)
+          (error "Non-zero exit code from shell %s invoked with args %S" shell shell-args)))
       (goto-char (point-min))
       (if (re-search-forward "__RESULT\0\\(.*\\)" nil t)
           (match-string 1)
-        (error "Expected printf output from shell, but got: %s" (buffer-string))))))
+        (error "Expected printf output from shell, but got: %S" (buffer-string))))))
 
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
