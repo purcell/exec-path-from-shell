@@ -36,6 +36,15 @@
 ;; It also allows other environment variables to be retrieved from the
 ;; shell, so that Emacs will see the same values you get in a terminal.
 
+;; If you use a non-POSIX-standard shell like "tcsh" or "fish", your
+;; shell will be asked to execute "sh" as a subshell in order to print
+;; out the variables in a format which can be reliably parsed. "sh"
+;; must be a POSIX-compliant shell in this case.
+
+;; Note that shell variables which have not been exported as
+;; environment variables (e.g. using the "export" keyword) may not be
+;; visible to `exec-path-from-shell'.
+
 ;; Installation:
 
 ;; ELPA packages are available on Marmalade and MELPA. Alternatively, place
@@ -101,6 +110,10 @@ The default value denotes an interactive login shell."
   (when exec-path-from-shell-debug
     (apply 'message msg args)))
 
+(defun exec-path-from-shell--standard-shell-p (shell)
+  "Return non-nil iff SHELL supports the standard ${VAR-default} syntax."
+  (not (string-match "\\(fish\\|tcsh\\)$" shell)))
+
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
@@ -119,7 +132,10 @@ shell-escaped, so they may contain $ etc."
                   " '__RESULT\\000" str "' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
          (shell-args (append exec-path-from-shell-arguments
-                             (list "-c" printf-command)))
+                             (list "-c"
+                                   (if (exec-path-from-shell--standard-shell-p (getenv "SHELL"))
+                                       printf-command
+                                     (concat "sh -c " (shell-quote-argument printf-command))))))
          (shell (getenv "SHELL")))
     (with-temp-buffer
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
@@ -138,17 +154,10 @@ shell-escaped, so they may contain $ etc."
 
 Execute $SHELL according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
-  (let* ((is-tcsh (exec-path-from-shell--tcsh-p (getenv "SHELL")))
-         (dollar-names (mapcar (lambda (n) (format (if is-tcsh "$%s" "${%s-}") n)) names))
-         (values (if is-tcsh
-                     ;; Dumb shell
-                     (mapcar (lambda (v)
-                               (exec-path-from-shell-printf "%s" (list v)))
-                             dollar-names)
-                   ;; Decent shell
-                   (split-string (exec-path-from-shell-printf
-                                  (mapconcat #'identity (make-list (length names) "%s") "\\000")
-                                  dollar-names) "\0"))))
+  (let* ((dollar-names (mapcar (lambda (n) (format "${%s-}" n)) names))
+         (values (split-string (exec-path-from-shell-printf
+                                (mapconcat #'identity (make-list (length names) "%s") "\\000")
+                                dollar-names) "\0")))
     (let (result)
       (while names
         (prog1
