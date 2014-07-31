@@ -38,7 +38,7 @@
 
 ;; Installation:
 
-;; ELPA packages are available on Marmalade and Melpa. Alternatively, place
+;; ELPA packages are available on Marmalade and MELPA. Alternatively, place
 ;; this file on a directory in your `load-path', and explicitly require it.
 
 ;; Usage:
