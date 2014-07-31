@@ -137,8 +137,9 @@ shell-escaped, so they may contain $ etc."
 
 Execute $SHELL according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
-  (let* ((dollar-names (mapcar (lambda (n) (format "${%s-}" n)) names))
-         (values (if (exec-path-from-shell--tcsh-p (getenv "SHELL"))
+  (let* ((is-tcsh (exec-path-from-shell--tcsh-p (getenv "SHELL")))
+         (dollar-names (mapcar (lambda (n) (format (if is-tcsh "$%s" "${%s-}") n)) names))
+         (values (if is-tcsh
                      ;; Dumb shell
                      (mapcar (lambda (v)
                                (exec-path-from-shell-printf "%s" (list v)))
