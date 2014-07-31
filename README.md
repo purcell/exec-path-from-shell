@@ -14,6 +14,18 @@ when calling external utilities like `make` from Emacs.
 This library works around this problem by copying important environment
 variables from the user's shell.
 
+Compatibility
+-------------
+
+If you use a non-POSIX-standard shell such as `tcsh` or `fish`, your
+shell will be asked to execute `sh` as a subshell in order to print
+out the variables in a format which can be reliably parsed. `sh` must
+be a POSIX-compliant shell in this case.
+
+Note that shell variables which have not been exported as environment
+variables (e.g. using the "export" keyword) may not be visible to
+`exec-path-from-shell'.
+
 Installation
 ------------
 
