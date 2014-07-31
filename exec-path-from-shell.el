@@ -126,7 +126,8 @@ shell-escaped, so they may contain $ etc."
       (let ((exit-code (apply #'call-process shell nil t nil shell-args)))
         (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
         (unless (zerop exit-code)
-          (error "Non-zero exit code from shell %s invoked with args %S" shell shell-args)))
+          (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
+                 shell shell-args (buffer-string))))
       (goto-char (point-min))
       (if (re-search-forward "__RESULT\0\\(.*\\)" nil t)
           (match-string 1)
