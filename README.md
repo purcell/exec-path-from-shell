@@ -1,5 +1,5 @@
-[![Melpa Status](http://melpa.milkbox.net/packages/exec-path-from-shell-badge.svg)](http://melpa.milkbox.net/#/exec-path-from-shell)
-[![Melpa Stable Status](http://melpa-stable.milkbox.net/packages/exec-path-from-shell-badge.svg)](http://melpa-stable.milkbox.net/#/exec-path-from-shell)
+[![Melpa Status](http://melpa.org/packages/exec-path-from-shell-badge.svg)](http://melpa.milkbox.net/#/exec-path-from-shell)
+[![Melpa Stable Status](http://stable.melpa.org/packages/exec-path-from-shell-badge.svg)](http://stable.melpa.org/#/exec-path-from-shell)
 
 exec-path-from-shell
 =====================
