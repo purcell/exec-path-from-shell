@@ -50,6 +50,9 @@ Add the following to your `init.el`:
 
 This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only on OS X.
 
+If this command does not work, you may need to add '(package-initialize)' before it. 
+
+
 You can copy values of other environment variables by customizing
 `exec-path-from-shell-variables` before invoking
 `exec-path-from-shell-initialize`, or by calling
