@@ -43,7 +43,7 @@ Usage
 
 Add the following to your `init.el`:
 
-```scheme
+```el
 (when (memq window-system '(mac ns))
   (exec-path-from-shell-initialize))
 ```
@@ -55,7 +55,7 @@ You can copy values of other environment variables by customizing
 `exec-path-from-shell-initialize`, or by calling
 `exec-path-from-shell-copy-env`, e.g.:
 
-```scheme
+```el
 (exec-path-from-shell-copy-env "PYTHONPATH")
 ```
 
