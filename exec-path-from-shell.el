@@ -91,7 +91,7 @@
 
 (defun exec-path-from-shell--tcsh-p (shell)
   "Return non-nil if SHELL appears to be tcsh."
-  (string-match "tcsh$" shell))
+  (and shell (string-match "tcsh$" shell)))
 
 (defun exec-path-from-shell--login-arg (shell)
   "Return the name of the --login arg for SHELL."
