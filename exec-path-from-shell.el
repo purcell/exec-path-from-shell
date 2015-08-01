@@ -154,7 +154,7 @@ shell-escaped, so they may contain $ etc."
 
 Execute $SHELL according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
-  (let* ((dollar-names (mapcar (lambda (n) (format "${%s-}" n)) names))
+  (let* ((dollar-names (mapcar (lambda (n) (format "${%s}" n)) names))
          (values (split-string (exec-path-from-shell-printf
                                 (mapconcat #'identity (make-list (length names) "%s") "\\000")
                                 dollar-names) "\0")))
