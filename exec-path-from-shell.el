@@ -98,7 +98,7 @@
   (if (exec-path-from-shell--tcsh-p shell) "-d" "-l"))
 
 (defcustom exec-path-from-shell-arguments
-  (list (exec-path-from-shell--login-arg (getenv "SHELL")) "-i")
+  (list "-i")
   "Additional arguments to pass to the shell.
 
 The default value denotes an interactive login shell."
