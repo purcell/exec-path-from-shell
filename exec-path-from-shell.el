@@ -148,14 +148,19 @@ shell-escaped, so they may contain $ etc."
 
 Execute $SHELL according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
-  (let* ((dollar-names (mapcar (lambda (n) (format "${%s-}" n)) names))
+  (let* ((random-default (md5 (format "%s%s%s" (emacs-pid) (random) (current-time))))
+         (dollar-names (mapcar (lambda (n) (format "${%s:-%s}" n random-default)) names))
          (values (split-string (exec-path-from-shell-printf
                                 (mapconcat #'identity (make-list (length names) "%s") "\\000")
                                 dollar-names) "\0")))
     (let (result)
       (while names
         (prog1
-            (push (cons (car names) (car values)) result)
+            (let ((value (car values)))
+              (push (cons (car names)
+                          (unless (string-equal random-default value)
+                            value))
+                    result))
           (setq values (cdr values)
                 names (cdr names))))
       result)))
