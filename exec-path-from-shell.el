@@ -188,9 +188,19 @@ variables such as `exec-path'."
 As a special case, if the variable is $PATH, then `exec-path' and
 `eshell-path-env' are also set appropriately.  The result is an alist,
 as described by `exec-path-from-shell-getenvs'."
-  (mapc (lambda (pair)
-          (exec-path-from-shell-setenv (car pair) (cdr pair)))
-        (exec-path-from-shell-getenvs names)))
+  (let ((pairs (exec-path-from-shell-getenvs names))
+        (without-minus-i (remove "-i" exec-path-from-shell-arguments)))
+
+    ;; If the user is using "-i", we warn them if it is necessary.
+    (unless (eq exec-path-from-shell-arguments without-minus-i)
+      (let* ((exec-path-from-shell-arguments without-minus-i)
+             (alt-pairs (exec-path-from-shell-getenvs names)))
+        (unless (equal pairs alt-pairs)
+          (warn "You appear to be setting environment variables in your .bashrc or .zshrc: those files are only read by interactive shells, so you should instead set environment variables in startup files like .bash_profile or .zshenv.  See the man page for your shell for more info.  In future, exec-path-from-shell will not read variables set in the wrong files."))))
+
+    (mapc (lambda (pair)
+            (exec-path-from-shell-setenv (car pair) (cdr pair)))
+          pairs)))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
