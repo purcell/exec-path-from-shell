@@ -194,9 +194,13 @@ as described by `exec-path-from-shell-getenvs'."
     ;; If the user is using "-i", we warn them if it is necessary.
     (unless (eq exec-path-from-shell-arguments without-minus-i)
       (let* ((exec-path-from-shell-arguments without-minus-i)
-             (alt-pairs (exec-path-from-shell-getenvs names)))
-        (unless (equal pairs alt-pairs)
-          (warn "You appear to be setting environment variables in your .bashrc or .zshrc: those files are only read by interactive shells, so you should instead set environment variables in startup files like .bash_profile or .zshenv.  See the man page for your shell for more info.  In future, exec-path-from-shell will not read variables set in the wrong files."))))
+             (alt-pairs (exec-path-from-shell-getenvs names))
+             different)
+        (dolist (pair pairs)
+          (unless (equal pair (assoc (car pair) alt-pairs))
+            (push (car pair) different)))
+        (when different
+          (warn "You appear to be setting environment variables %S in your .bashrc or .zshrc: those files are only read by interactive shells, so you should instead set environment variables in startup files like .bash_profile or .zshenv.  Refer to your shell's man page for more info.  In future, exec-path-from-shell will not read variables set in the wrong files." different))))
 
     (mapc (lambda (pair)
             (exec-path-from-shell-setenv (car pair) (cdr pair)))
