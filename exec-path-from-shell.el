@@ -82,6 +82,13 @@
   :type '(repeat (string :tag "Environment variable"))
   :group 'exec-path-from-shell)
 
+(defcustom exec-path-from-shell-check-startup-files t
+  "If non-nil, warn if variables are being set in the wrong shell startup files.
+Environment variables should be set in .profile or .zshenv rather than
+.bashrc or .zshrc."
+  :type 'boolean
+  :group 'exec-path-from-shell)
+
 (defvar exec-path-from-shell-debug nil
   "Display debug info when non-nil.")
 
@@ -189,7 +196,8 @@ As a special case, if the variable is $PATH, then `exec-path' and
 `eshell-path-env' are also set appropriately.  The result is an alist,
 as described by `exec-path-from-shell-getenvs'."
   (let ((pairs (exec-path-from-shell-getenvs names)))
-    (exec-path-from-shell--maybe-warn-about-startup-files pairs)
+    (when exec-path-from-shell-check-startup-files
+      (exec-path-from-shell--maybe-warn-about-startup-files pairs))
     (mapc (lambda (pair)
             (exec-path-from-shell-setenv (car pair) (cdr pair)))
           pairs)))
@@ -206,7 +214,7 @@ as described by `exec-path-from-shell-getenvs'."
           (unless (equal pair (assoc (car pair) alt-pairs))
             (push (car pair) different)))
         (when different
-          (message "You appear to be setting environment variables %S in your .bashrc or .zshrc: those files are only read by interactive shells, so you should instead set environment variables in startup files like .bash_profile or .zshenv.  Refer to your shell's man page for more info.  In future, exec-path-from-shell will not read variables set in the wrong files." different))))))
+          (message "You appear to be setting environment variables %S in your .bashrc or .zshrc: those files are only read by interactive shells, so you should instead set environment variables in startup files like .profile, .bash_profile or .zshenv.  Refer to your shell's man page for more info.  Customize `exec-path-from-shell-arguments' to remove \"-i\" when done, or disable `exec-path-from-shell-check-startup-files' to disable this message." different))))))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-env (name)
