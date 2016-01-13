@@ -36,7 +36,7 @@ Installation
 
 ELPA packages are available on Marmalade and MELPA.  Alternatively, [download][]
 the latest release or clone the repository, and install
-`exec-path-from-shell.el` with `M-x package-install-from-file`.
+`exec-path-from-shell.el` with `M-x package-install-file`.
 
 Usage
 -----
