@@ -22,7 +22,11 @@ variables of interest, then copying them into the Emacs environment.
 Compatibility
 -------------
 
-If you use a non-POSIX-standard shell such as `tcsh` or `fish`, your
+At a minimum, this package assumes that your shell is at least UNIX-y: if
+`(getenv "SHELL")` evaluates to something like `".../cmdproxy.exe"`, this
+package probably isn't for you.
+
+Further, if you use a non-POSIX-standard shell such as `tcsh` or `fish`, your
 shell will be asked to execute `sh` as a subshell in order to print
 out the variables in a format which can be reliably parsed. `sh` must
 be a POSIX-compliant shell in this case.
