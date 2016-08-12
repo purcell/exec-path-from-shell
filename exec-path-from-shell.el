@@ -97,7 +97,7 @@ Environment variables should be set in .profile or .zshenv rather than
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
 (defcustom exec-path-from-shell-arguments
-  (if (string-match-p "t?csh$" (getenv "SHELL"))
+  (if (string-match-p "t?csh$" (or (getenv "SHELL") ""))
       (list "-d")
     (list "-l" "-i"))
   "Additional arguments to pass to the shell.
