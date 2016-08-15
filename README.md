@@ -15,7 +15,7 @@ Ever find that a command works in your shell, but not in Emacs?
 This happens a lot on OS X, where an Emacs instance started from the GUI inherits a
 default set of environment variables.
 
-This library works solves this problem by copying important environment
+This library solves this problem by copying important environment
 variables from the user's shell: it works by asking your shell to print out the
 variables of interest, then copying them into the Emacs environment.
 
