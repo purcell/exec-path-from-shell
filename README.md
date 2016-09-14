@@ -38,7 +38,7 @@ variables (e.g. using the "export" keyword) may not be visible to
 Installation
 ------------
 
-ELPA packages are available on Marmalade and MELPA.  Alternatively, [download][]
+Installable packages are available via MELPA.  Alternatively, [download][]
 the latest release or clone the repository, and install
 `exec-path-from-shell.el` with `M-x package-install-file`.
 
