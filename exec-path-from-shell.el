@@ -97,6 +97,10 @@ Environment variables should be set in .profile or .zshenv rather than
   "Double-quote S, escaping any double-quotes already contained in it."
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
+(defun exec-path-from-shell--shell ()
+  "Return the shell to use."
+  (or (getenv "SHELL") (error "SHELL environment variable is unset")))
+
 (defcustom exec-path-from-shell-arguments
   (if (string-match-p "t?csh$" (or (getenv "SHELL") ""))
       (list "-d")
@@ -133,12 +137,12 @@ shell-escaped, so they may contain $ etc."
           (concat printf-bin
                   " '__RESULT\\000" str "' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
+         (shell (exec-path-from-shell--shell))
          (shell-args (append exec-path-from-shell-arguments
                              (list "-c"
-                                   (if (exec-path-from-shell--standard-shell-p (getenv "SHELL"))
+                                   (if (exec-path-from-shell--standard-shell-p shell)
                                        printf-command
-                                     (concat "sh -c " (shell-quote-argument printf-command))))))
-         (shell (getenv "SHELL")))
+                                     (concat "sh -c " (shell-quote-argument printf-command)))))))
     (with-temp-buffer
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
       (let ((exit-code (apply #'call-process shell nil t nil shell-args)))
