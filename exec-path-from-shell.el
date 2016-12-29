@@ -38,7 +38,7 @@
 
 ;; If you use a non-POSIX-standard shell like "tcsh" or "fish", your
 ;; shell will be asked to execute "sh" as a subshell in order to print
-;; out the variables in a format which can be reliably parsed. "sh"
+;; out the variables in a format which can be reliably parsed.  "sh"
 ;; must be a POSIX-compliant shell in this case.
 
 ;; Note that shell variables which have not been exported as
@@ -47,8 +47,9 @@
 
 ;; Installation:
 
-;; ELPA packages are available on Marmalade and MELPA. Alternatively, place
-;; this file on a directory in your `load-path', and explicitly require it.
+;; ELPA packages are available on Marmalade and MELPA.  Alternatively,
+;; place this file on a directory in your `load-path', and explicitly
+;; require it.
 
 ;; Usage:
 ;;
