@@ -90,6 +90,13 @@ Environment variables should be set in .profile or .zshenv rather than
   :type 'boolean
   :group 'exec-path-from-shell)
 
+(defcustom exec-path-from-shell-shell-name nil
+  "If non-nil, use this shell executable.
+Otherwise, use either `shell-file-name' (if set), or the value of
+the SHELL environment variable."
+  :type 'file
+  :group 'exec-path-from-shell)
+
 (defvar exec-path-from-shell-debug nil
   "Display debug info when non-nil.")
 
@@ -98,11 +105,16 @@ Environment variables should be set in .profile or .zshenv rather than
   (concat "\"" (replace-regexp-in-string "\"" "\\\\\"" s) "\""))
 
 (defun exec-path-from-shell--shell ()
-  "Return the shell to use."
-  (or (getenv "SHELL") (error "SHELL environment variable is unset")))
+  "Return the shell to use.
+See documentation for `exec-path-from-shell-shell-name'."
+  (or
+   exec-path-from-shell-shell-name
+   shell-file-name
+   (getenv "SHELL")
+   (error "SHELL environment variable is unset")))
 
 (defcustom exec-path-from-shell-arguments
-  (if (string-match-p "t?csh$" (or (getenv "SHELL") ""))
+  (if (string-match-p "t?csh$" (exec-path-from-shell--shell))
       (list "-d")
     (list "-l" "-i"))
   "Additional arguments to pass to the shell.
@@ -117,13 +129,13 @@ The default value denotes an interactive login shell."
     (apply 'message msg args)))
 
 (defun exec-path-from-shell--standard-shell-p (shell)
-  "Return non-nil iff SHELL supports the standard ${VAR-default} syntax."
+  "Return non-nil iff the shell supports the standard ${VAR-default} syntax."
   (not (string-match "\\(fish\\|t?csh\\)$" shell)))
 
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
-Executes $SHELL as interactive login shell.
+Executes the shell as interactive login shell.
 
 STR is inserted literally in a single-quoted argument to printf,
 and may therefore contain backslashed escape sequences understood
@@ -158,7 +170,7 @@ shell-escaped, so they may contain $ etc."
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
 
-Execute $SHELL according to `exec-path-from-shell-arguments'.
+Execute the shell according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
   (let* ((random-default (md5 (format "%s%s%s" (emacs-pid) (random) (current-time))))
          (dollar-names (mapcar (lambda (n) (format "${%s-%s}" n random-default)) names))
@@ -180,7 +192,7 @@ The result is a list of (NAME . VALUE) pairs."
 (defun exec-path-from-shell-getenv (name)
   "Get the environment variable NAME from the user's shell.
 
-Execute $SHELL as interactive login shell, have it output the
+Execute the shell as interactive login shell, have it output the
 variable of NAME and return this output as string."
   (cdr (assoc name (exec-path-from-shell-getenvs (list name)))))
 
