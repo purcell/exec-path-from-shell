@@ -48,7 +48,7 @@ Usage
 Add the following to your `init.el` (after calling `package-initialize`):
 
 ```el
-(when (memq window-system '(mac ns))
+(when (eq window-system 'ns)
   (exec-path-from-shell-initialize))
 ```
 
