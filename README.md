@@ -48,11 +48,12 @@ Usage
 Add the following to your `init.el` (after calling `package-initialize`):
 
 ```el
-(when (memq window-system '(mac ns))
+(when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 ```
 
-This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only on OS X.
+This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only on OS X
+and Linux.
 
 You can copy values of other environment variables by customizing
 `exec-path-from-shell-variables` before invoking
