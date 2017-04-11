@@ -66,7 +66,7 @@ You can copy values of other environment variables by customizing
 
 This function may also be called interactively.
 
-Note that your shell will inherit Emacssenvironment variables when
+Note that your shell will inherit Emacs's environment variables when
 it is run -- to avoid surprises your config files should therefore
 set the environment variables to their exact desired final values,
 i.e. don't do this:
