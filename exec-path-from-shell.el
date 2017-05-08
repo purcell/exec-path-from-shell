@@ -204,8 +204,9 @@ Additionally, if NAME is \"PATH\" then also set corresponding
 variables such as `exec-path'."
   (setenv name value)
   (when (string-equal "PATH" name)
-    (setq eshell-path-env value
-          exec-path (append (parse-colon-path value) (list exec-directory)))))
+    (custom-set-variables
+     `(eshell-path-env ,value))
+    (setq exec-path (append (parse-colon-path value) (list exec-directory)))))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-envs (names)
