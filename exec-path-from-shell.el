@@ -62,7 +62,7 @@
 ;; If you use your Emacs config on other platforms, you can instead
 ;; make initialization conditional as follows:
 ;;
-;;     (when (memq window-system '(mac ns))
+;;     (when (memq window-system '(ns x nil))
 ;;       (exec-path-from-shell-initialize))
 ;;
 ;; Alternatively, you can use `exec-path-from-shell-copy-envs' or
