@@ -149,7 +149,7 @@ shell-escaped, so they may contain $ etc."
   (let* ((printf-bin (or (executable-find "printf") "printf"))
          (printf-command
           (concat printf-bin
-                  " '__RESULT\\000" str "' "
+                  " '__RESULT\\000" str "\\000__RESULT' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
          (shell (exec-path-from-shell--shell))
          (shell-args (append exec-path-from-shell-arguments
@@ -165,7 +165,7 @@ shell-escaped, so they may contain $ etc."
           (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
                  shell shell-args (buffer-string))))
       (goto-char (point-min))
-      (if (re-search-forward "__RESULT\0\\(.*\\)" nil t)
+      (if (re-search-forward "__RESULT\0\\(.*\\)\0__RESULT" nil t)
           (match-string 1)
         (error "Expected printf output from shell, but got: %S" (buffer-string))))))
 
