@@ -131,7 +131,7 @@ The default value denotes an interactive login shell."
     (apply 'message msg args)))
 
 (defun exec-path-from-shell--standard-shell-p (shell)
-  "Return non-nil iff the shell supports the standard ${VAR-default} syntax."
+  "Return non-nil if the shell supports the standard ${VAR-default} syntax."
   (not (string-match "\\(fish\\|t?csh\\)$" shell)))
 
 (defun exec-path-from-shell-printf (str &optional args)
