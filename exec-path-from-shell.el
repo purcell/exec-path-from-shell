@@ -162,7 +162,7 @@ shell-escaped, so they may contain $ etc."
   (let* ((printf-bin (or (executable-find "printf") "printf"))
          (printf-command
           (concat (if exec-path-from-shell-rc-file-path
-                      (concat "source " exec-path-from-shell-rc-file-path ">/dev/null; ")
+                      (concat "source " exec-path-from-shell-rc-file-path " >/dev/null; ")
                       "")
                   printf-bin
                   " '__RESULT\\000" str "\\000__RESULT' "
