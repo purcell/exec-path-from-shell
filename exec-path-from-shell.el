@@ -128,6 +128,16 @@ The default value denotes an interactive login shell."
   :type '(repeat (string :tag "Shell argument"))
   :group 'exec-path-from-shell)
 
+(defcustom exec-path-from-shell-rc-file-path
+  nil
+  "File path sourced just before getting environment variables.
+
+Default value is nil.  If nil, no file sourced."
+  :type '(choice
+          (const nil)
+          (string))
+  :group 'exec-path-from-shell)
+
 (defun exec-path-from-shell--debug (msg &rest args)
   "Print MSG and ARGS like `message', but only if debug output is enabled."
   (when exec-path-from-shell-debug
@@ -151,7 +161,10 @@ in place of any % placeholders in STR.  ARGS are not automatically
 shell-escaped, so they may contain $ etc."
   (let* ((printf-bin (or (executable-find "printf") "printf"))
          (printf-command
-          (concat printf-bin
+          (concat (if exec-path-from-shell-rc-file-path
+                      (concat "source " exec-path-from-shell-rc-file-path ">/dev/null; ")
+                      "")
+                  printf-bin
                   " '__RESULT\\000" str "\\000__RESULT' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
          (shell (exec-path-from-shell--shell))
