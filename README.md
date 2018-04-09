@@ -23,6 +23,9 @@ variables of interest, then copying them into the Emacs environment.
 Compatibility
 -------------
 
+If the path printed by evaluating `(getenv "SHELL")` in Emacs points at `bash`
+or `zsh`, this should work fine.
+
 At a minimum, this package assumes that your shell is at least UNIX-y: if
 `(getenv "SHELL")` evaluates to something like `".../cmdproxy.exe"`, this
 package probably isn't for you.
