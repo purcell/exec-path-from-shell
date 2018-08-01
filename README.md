@@ -42,7 +42,10 @@ variables (e.g. using the "export" keyword) may not be visible to
 Installation
 ------------
 
-Installable packages are available via MELPA.  Alternatively, [download][]
+Installable packages are available via MELPA:  do
+`M-x package-install RET exec-path-from-shell RET`.
+
+Alternatively, [download][]
 the latest release or clone the repository, and install
 `exec-path-from-shell.el` with `M-x package-install-file`.
 
