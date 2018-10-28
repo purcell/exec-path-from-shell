@@ -2,14 +2,13 @@
 [![Melpa Stable Status](http://stable.melpa.org/packages/exec-path-from-shell-badge.svg)](http://stable.melpa.org/#/exec-path-from-shell)
 <a href="https://www.patreon.com/sanityinc"><img alt="Support me" src="https://img.shields.io/badge/Support%20Me-%F0%9F%92%97-ff69b4.svg"></a>
 
-exec-path-from-shell
-=====================
+# exec-path-from-shell
+
 
 A GNU Emacs library to ensure environment variables inside Emacs look
 the same as in the user's shell.
 
-Motivation
-----------
+## Motivation
 
 Ever find that a command works in your shell, but not in Emacs?
 
@@ -20,8 +19,7 @@ This library solves this problem by copying important environment
 variables from the user's shell: it works by asking your shell to print out the
 variables of interest, then copying them into the Emacs environment.
 
-Compatibility
--------------
+## Compatibility
 
 If the path printed by evaluating `(getenv "SHELL")` in Emacs points at `bash`
 or `zsh`, this should work fine.
@@ -39,8 +37,7 @@ Note that shell variables which have not been exported as environment
 variables (e.g. using the "export" keyword) may not be visible to
 `exec-path-from-shell'.
 
-Installation
-------------
+## Installation
 
 Installable packages are available via MELPA:  do
 `M-x package-install RET exec-path-from-shell RET`.
@@ -49,8 +46,7 @@ Alternatively, [download][]
 the latest release or clone the repository, and install
 `exec-path-from-shell.el` with `M-x package-install-file`.
 
-Usage
------
+## Usage
 
 Add the following to your `init.el` (after calling `package-initialize`):
 
@@ -73,10 +69,12 @@ You can copy values of other environment variables by customizing
 
 This function may also be called interactively.
 
+### Setting up your shell startup files correctly
+
 Note that your shell will inherit Emacs's environment variables when
-it is run -- to avoid surprises your config files should therefore
-set the environment variables to their exact desired final values,
-i.e. don't do this:
+it is run by `exec-path-from-shell` -- to avoid surprises your config
+files should therefore set the environment variables to their exact
+desired final values, i.e. don't do this:
 
 ```
 export PATH=/usr/local/bin:$PATH
@@ -87,6 +85,16 @@ but instead do this:
 ```
 export PATH=/usr/local/bin:/usr/bin:/bin
 ```
+
+You should also set your environment variables so that they are
+available to both interactive and non-interactive shells. In practical
+terms, for most people this means setting them in `~/.profile`,
+`~/.bash_profile`, `~/.zshenv` instead of `~/.bashrc` and
+`~/.zshrc`. By default, `exec-path-from-shell` checks for this
+mistake, at the cost of some execution time. If your config files are
+set up properly, you can set `exec-path-from-shell-arguments`
+appropriately (often to `nil`) before calling
+`exec-path-from-shell-initialize` to avoid this overhead.
 
 
 Further help
