@@ -119,9 +119,12 @@ See documentation for `exec-path-from-shell-shell-name'."
    (error "SHELL environment variable is unset")))
 
 (defcustom exec-path-from-shell-arguments
-  (if (string-match-p "t?csh$" (exec-path-from-shell--shell))
-      (list "-d")
-    (list "-l" "-i"))
+  (let ((shell (exec-path-from-shell--shell)))
+    (if (string-match-p "t?csh$" shell)
+        (list "-d")
+      (if (string-match-p "fish" shell)
+          (list "-l")
+        (list "-l" "-i"))))
   "Additional arguments to pass to the shell.
 
 The default value denotes an interactive login shell."
