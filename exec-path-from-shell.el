@@ -180,6 +180,8 @@ shell-escaped, so they may contain $ etc."
 
 Execute the shell according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
+  (when (file-remote-p default-directory)
+    (error "You cannot run exec-path-from-shell from a remote buffer (Tramp, etc.)"))
   (let* ((random-default (md5 (format "%s%s%s" (emacs-pid) (random) (current-time))))
          (dollar-names (mapcar (lambda (n) (format "${%s-%s}" n random-default)) names))
          (values (split-string (exec-path-from-shell-printf
