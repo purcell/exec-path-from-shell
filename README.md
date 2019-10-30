@@ -96,6 +96,9 @@ set up properly, you can set `exec-path-from-shell-arguments`
 appropriately (often to `nil`) before calling
 `exec-path-from-shell-initialize` to avoid this overhead.
 
+To learn more about how popular shells load start-up files, read
+[this helpful article](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html).
+
 
 Further help
 ------------
