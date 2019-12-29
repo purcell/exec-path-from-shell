@@ -73,7 +73,7 @@
 ;;; Code:
 
 ;; Satisfy the byte compiler
-(defvar eshell-path-env)
+(eval-when-compile (require 'eshell))
 
 (defgroup exec-path-from-shell nil
   "Make Emacs use shell-defined values for $PATH etc."
