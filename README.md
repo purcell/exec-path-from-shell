@@ -1,5 +1,6 @@
 [![Melpa Status](http://melpa.org/packages/exec-path-from-shell-badge.svg)](http://melpa.milkbox.net/#/exec-path-from-shell)
 [![Melpa Stable Status](http://stable.melpa.org/packages/exec-path-from-shell-badge.svg)](http://stable.melpa.org/#/exec-path-from-shell)
+[![Build Status](https://github.com/purcell/exec-path-from-shell/workflows/CI/badge.svg)](https://github.com/purcell/exec-path-from-shell/actions)
 <a href="https://www.patreon.com/sanityinc"><img alt="Support me" src="https://img.shields.io/badge/Support%20Me-%F0%9F%92%97-ff69b4.svg"></a>
 
 # exec-path-from-shell
