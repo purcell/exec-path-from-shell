@@ -100,6 +100,11 @@ appropriately (often to `nil`) before calling
 To learn more about how popular shells load start-up files, read
 [this helpful article](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html).
 
+Making `exec-path-from-shell` faster
+------------------------------------
+
+* Invoking the shell has a non-trivial overhead. Don't call `exec-path-from-shell-copy-env` repeatedly, since each invocation starts a shell. Instead, set `exec-path-from-shell-variables` to the full list of vars you want, and call `exec-path-from-shell-initialize` once.
+* Non-interactive shells start up faster. Follow the steps in the section above so that you can run your shell without `-i` and still get the right environment variable settings. When `"-i"` is then removed from `exec-path-from-shell-arguments`, this package becomes more efficient.
 
 Further help
 ------------
