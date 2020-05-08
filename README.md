@@ -52,7 +52,7 @@ the latest release or clone the repository, and install
 Add the following to your `init.el` (after calling `package-initialize`):
 
 ```el
-(when (memq window-system '(mac ns x))
+(unless (memq system-type '(ms-dos windows-nt))
   (exec-path-from-shell-initialize))
 ```
 
