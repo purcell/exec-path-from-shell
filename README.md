@@ -56,8 +56,8 @@ Add the following to your `init.el` (after calling `package-initialize`):
   (exec-path-from-shell-initialize))
 ```
 
-This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only on OS X
-and Linux.
+This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only
+when executed in a GUI frame on OS X and Linux.
 
 You can copy values of other environment variables by customizing
 `exec-path-from-shell-variables` before invoking
