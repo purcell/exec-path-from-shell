@@ -13,8 +13,9 @@ the same as in the user's shell.
 
 Ever find that a command works in your shell, but not in Emacs?
 
-This happens a lot on OS X, where an Emacs instance started from the GUI inherits a
-default set of environment variables.
+This happens a lot on OS X, where an Emacs instance launched as a GUI app inherits a
+default minimal set of environment variables that are probably not the ones you see
+in a terminal window.
 
 This library solves this problem by copying important environment
 variables from the user's shell: it works by asking your shell to print out the
