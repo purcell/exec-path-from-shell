@@ -15,7 +15,8 @@ Ever find that a command works in your shell, but not in Emacs?
 
 This happens a lot on OS X, where an Emacs instance launched as a GUI app inherits a
 default minimal set of environment variables that are probably not the ones you see
-in a terminal window.
+in a terminal window. Similarly, if you start Emacs as a daemon from `systemd` or `launchd`,
+it will run with a default set of environment variables.
 
 This library solves this problem by copying important environment
 variables from the user's shell: it works by asking your shell to print out the
@@ -59,6 +60,14 @@ Add the following to your `init.el` (after calling `package-initialize`):
 
 This sets `$MANPATH`, `$PATH` and `exec-path` from your shell, but only
 when executed in a GUI frame on OS X and Linux.
+
+If you launch Emacs as a daemon from `systemd` or similar, you
+might like to use the following snippet:
+
+```el
+(when (daemonp)
+  (exec-path-from-shell-initialize))
+```
 
 You can copy values of other environment variables by customizing
 `exec-path-from-shell-variables` before invoking
