@@ -6,7 +6,7 @@
 ;; Keywords: unix, environment
 ;; URL: https://github.com/purcell/exec-path-from-shell
 ;; Package-Version: 0
-;; Package-Requires: ((emacs "24.1"))
+;; Package-Requires: ((emacs "24.1") (cl-lib "0.6"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -75,6 +75,7 @@
 
 ;; Satisfy the byte compiler
 (eval-when-compile (require 'eshell))
+(require 'cl-lib)
 
 (defgroup exec-path-from-shell nil
   "Make Emacs use shell-defined values for $PATH etc."
@@ -141,8 +142,8 @@ The default value denotes an interactive login shell."
 (defmacro exec-path-from-shell--warn-duration (&rest body)
   "Evaluate BODY and warn if execution duration exceeds a time limit.
 The limit is given by `exec-path-from-shell-warn-duration-millis'."
-  (let ((start-time (gensym))
-        (duration-millis (gensym)))
+  (let ((start-time (cl-gensym))
+        (duration-millis (cl-gensym)))
     `(let ((,start-time (current-time)))
        (prog1
            (progn ,@body)
