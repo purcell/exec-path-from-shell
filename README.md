@@ -97,15 +97,21 @@ but instead do this:
 export PATH=/usr/local/bin:/usr/bin:/bin
 ```
 
-You should also set your environment variables so that they are
-available to both interactive and non-interactive shells. In practical
-terms, for most people this means setting them in `~/.profile`,
-`~/.bash_profile`, `~/.zshenv` instead of `~/.bashrc` and
-`~/.zshrc`. By default, `exec-path-from-shell` checks for this
-mistake, at the cost of some execution time. If your config files are
-set up properly, you can set `exec-path-from-shell-arguments`
-appropriately (often to `nil`) before calling
-`exec-path-from-shell-initialize` to avoid this overhead.
+To be safe, `exec-path-from-shell` starts an interactive (and login)
+shell by default, but this can be much slower than necessary.
+Interactive shells often have fancy features enabled that are only
+helpful when one interacts directly with the shell, and this can
+frequently cause startup time to exceed 750ms.  This can be avoided:
+
+* Follow best practice by setting your environment variables so that
+  they are available to both interactive and non-interactive shells.
+  In practical terms, for most people this means setting them in
+  `~/.profile`, `~/.bash_profile`, `~/.zshenv` instead of `~/.bashrc`
+  and `~/.zshrc`.
+* Once a non-interactive shell sets your environment variables
+  correctly, adjust `exec-path-from-shell-arguments` appropriately
+  (often to `nil`) before calling `exec-path-from-shell-initialize` so
+  that it will start a non-interactive shell.
 
 To learn more about how popular shells load start-up files, read
 [this helpful article](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html).
@@ -113,8 +119,20 @@ To learn more about how popular shells load start-up files, read
 Making `exec-path-from-shell` faster
 ------------------------------------
 
-* Invoking the shell has a non-trivial overhead. Don't call `exec-path-from-shell-copy-env` repeatedly, since each invocation starts a shell. Instead, set `exec-path-from-shell-variables` to the full list of vars you want, and call `exec-path-from-shell-initialize` once.
-* Non-interactive shells start up faster. Follow the steps in the section above so that you can run your shell without `-i` and still get the right environment variable settings. When `"-i"` is then removed from `exec-path-from-shell-arguments`, this package becomes more efficient.
+If evaluation takes more than
+`exec-path-from-shell-warn-duration-millis` (500ms by default) then
+`exec-path-from-shell` will print a warning.
+
+* Non-interactive shells start up faster. Follow the steps in the
+  section above so that you can run your shell without `-i` and still
+  get the right environment variable settings. When `"-i"` is then
+  removed from `exec-path-from-shell-arguments`, this package becomes
+  more efficient.
+* Invoking the shell has a non-trivial overhead in any case. Don't
+  call `exec-path-from-shell-copy-env` repeatedly, since each
+  invocation starts a shell. Instead, set
+  `exec-path-from-shell-variables` to the full list of vars you want,
+  and call `exec-path-from-shell-initialize` once.
 
 Further help
 ------------
