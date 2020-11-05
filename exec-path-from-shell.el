@@ -209,8 +209,8 @@ variable of NAME and return this output as string."
 
 (defun exec-path-from-shell-setenv (name value)
   "Set the value of environment var NAME to VALUE.
-Additionally, if NAME is \"PATH\" then also set corresponding
-variables such as `exec-path'."
+Additionally, if NAME is \"PATH\" then also update the
+variables `exec-path' and `eshell-path-env'."
   (setenv name value)
   (when (string-equal "PATH" name)
     (setq eshell-path-env value
@@ -220,9 +220,10 @@ variables such as `exec-path'."
 (defun exec-path-from-shell-copy-envs (names)
   "Set the environment variables with NAMES from the user's shell.
 
-As a special case, if the variable is $PATH, then `exec-path' and
-`eshell-path-env' are also set appropriately.  The result is an alist,
-as described by `exec-path-from-shell-getenvs'."
+As a special case, if the variable is $PATH, then the variables
+`exec-path' and `eshell-path-env' are also set appropriately.
+The result is an alist, as described by
+`exec-path-from-shell-getenvs'."
   (let ((pairs (exec-path-from-shell-getenvs names)))
     (when exec-path-from-shell-check-startup-files
       (exec-path-from-shell--maybe-warn-about-startup-files pairs))
@@ -248,9 +249,9 @@ as described by `exec-path-from-shell-getenvs'."
 (defun exec-path-from-shell-copy-env (name)
   "Set the environment variable $NAME from the user's shell.
 
-As a special case, if the variable is $PATH, then `exec-path' and
-`eshell-path-env' are also set appropriately.  Return the value
-of the environment variable."
+As a special case, if the variable is $PATH, then the variables
+`exec-path' and `eshell-path-env' are also set appropriately.
+Return the value of the environment variable."
   (interactive "sCopy value of which environment variable from shell? ")
   (cdar (exec-path-from-shell-copy-envs (list name))))
 
