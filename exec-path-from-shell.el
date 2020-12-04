@@ -225,8 +225,14 @@ Additionally, if NAME is \"PATH\" then also update the
 variables `exec-path' and `eshell-path-env'."
   (setenv name value)
   (when (string-equal "PATH" name)
-    (setq eshell-path-env value
-          exec-path (append (parse-colon-path value) (list exec-directory)))))
+    (setq exec-path (append (parse-colon-path value) (list exec-directory)))
+    ;; `eshell-path-env' is a buffer local variable so we set the default value
+    ;; and then set the value in each `eshell' buffer.
+    (setq-default eshell-path-env value)
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (derived-mode-p 'eshell-mode)
+          (setq eshell-path-env value))))))
 
 ;;;###autoload
 (defun exec-path-from-shell-copy-envs (names)
