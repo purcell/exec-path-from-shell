@@ -112,6 +112,13 @@ frequently cause startup time to exceed 750ms.  This can be avoided:
   correctly, adjust `exec-path-from-shell-arguments` appropriately
   (often to `nil`) before calling `exec-path-from-shell-initialize` so
   that it will start a non-interactive shell.
+    - Here is a simple example to use a non-interactive shell:
+    
+      ```lisp
+      (use-package exec-path-from-shell
+        :config (setq exec-path-from-shell-arguments nil)
+          (exec-path-from-shell-initialize))
+      ```
 
 To learn more about how popular shells load start-up files, read
 [this helpful article](https://blog.flowblok.id.au/2013-02/shell-startup-scripts.html).
