@@ -89,7 +89,7 @@
   :group 'exec-path-from-shell)
 
 (defcustom exec-path-from-shell-warn-duration-millis 500
-  "Print a warning message if shell execution takes longer than this many milliseconds."
+  "Print a warning if shell execution takes longer than this many milliseconds."
   :type 'integer)
 
 (defcustom exec-path-from-shell-shell-name nil
