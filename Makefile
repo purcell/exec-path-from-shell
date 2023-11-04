@@ -1,7 +1,7 @@
 EMACS ?= emacs
 
 # A space-separated list of required package names
-NEEDED_PACKAGES = package-lint
+DEPS =
 
 INIT_PACKAGES="(progn \
   (require 'package) \
@@ -17,10 +17,10 @@ INIT_PACKAGES="(progn \
 all: compile package-lint clean-elc
 
 package-lint:
-	${EMACS} -Q --eval ${INIT_PACKAGES} -batch -f package-lint-batch-and-exit exec-path-from-shell.el
+	${EMACS} -Q --eval $(subst PACKAGES,package-lint,${INIT_PACKAGES}) -batch -f package-lint-batch-and-exit exec-path-from-shell.el
 
 compile: clean-elc
-	${EMACS} -Q --eval ${INIT_PACKAGES} -L . -batch -f batch-byte-compile *.el
+	${EMACS} -Q --eval $(subst PACKAGES,${DEPS},${INIT_PACKAGES}) -L . -batch -f batch-byte-compile *.el
 
 clean-elc:
 	rm -f f.elc
