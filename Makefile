@@ -1,7 +1,7 @@
 EMACS ?= emacs
 
 # A space-separated list of required package names
-DEPS =
+DEPS = cl-lib
 
 INIT_PACKAGES="(progn \
   (require 'package) \
