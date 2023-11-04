@@ -7,7 +7,7 @@ INIT_PACKAGES="(progn \
   (require 'package) \
   (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) \
   (package-initialize) \
-  (dolist (pkg '(DEPS)) \
+  (dolist (pkg '(PACKAGES)) \
     (unless (package-installed-p pkg) \
       (unless (assoc pkg package-archive-contents) \
         (package-refresh-contents)) \
