@@ -166,7 +166,7 @@ in place of any % placeholders in STR.  ARGS are not automatically
 shell-escaped, so they may contain $ etc."
   (let* ((printf-bin (or (executable-find "printf") "printf"))
          (printf-command
-          (concat printf-bin
+          (concat (shell-quote-argument printf-bin)
                   " '__RESULT\\000" str "\\000__RESULT' "
                   (mapconcat #'exec-path-from-shell--double-quote args " ")))
          (shell (exec-path-from-shell--shell))
