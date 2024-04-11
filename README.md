@@ -25,21 +25,22 @@ variables of interest, then copying them into the Emacs environment.
 
 ## Compatibility
 
-If the path printed by evaluating `(getenv "SHELL")` in Emacs points at `bash`
-or `zsh`, this should work fine.
+Supported shells:
 
-At a minimum, this package assumes that your shell is at least UNIX-y: if
-`(getenv "SHELL")` evaluates to something like `".../cmdproxy.exe"`, this
-package probably isn't for you.
-
-Further, if you use a non-POSIX-standard shell such as `tcsh` or `fish`, your
-shell will be asked to execute `sh` as a subshell in order to print
-out the variables in a format which can be reliably parsed. `sh` must
-be a POSIX-compliant shell in this case.
+* `zsh`
+* `bash`
+* `tcsh`
+* `fish`
+* `nu`
 
 Note that shell variables which have not been exported as environment
 variables (e.g. using the "export" keyword) may not be visible to
-`exec-path-from-shell'.
+`exec-path-from-shell`.
+
+If you experience issues, enable the variable
+`exec-path-from-shell-debug` before runnin functions from the package:
+this will produce detailed logging in `*Messages*` about the shell
+command line and output.
 
 ## Installation
 

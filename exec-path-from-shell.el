@@ -6,7 +6,7 @@
 ;; Keywords: unix, environment
 ;; URL: https://github.com/purcell/exec-path-from-shell
 ;; Package-Version: 2.1
-;; Package-Requires: ((emacs "24.1") (cl-lib "0.6"))
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is not part of GNU Emacs.
 
@@ -76,6 +76,7 @@
 ;; Satisfy the byte compiler
 (eval-when-compile (require 'eshell))
 (require 'cl-lib)
+(require 'json)
 
 (defgroup exec-path-from-shell nil
   "Make Emacs use shell-defined values for $PATH etc."
@@ -135,9 +136,13 @@ The default value denotes an interactive login shell."
   (when exec-path-from-shell-debug
     (apply 'message msg args)))
 
+(defun exec-path-from-shell--nushell-p (shell)
+  "Return non-nil if SHELL is nu."
+  (string-match-p "nu$" shell))
+
 (defun exec-path-from-shell--standard-shell-p (shell)
   "Return non-nil iff SHELL supports the standard ${VAR-default} syntax."
-  (not (string-match "\\(fish\\|nu\\|t?csh\\)$" shell)))
+  (not (string-match-p "\\(fish\\|nu\\|t?csh\\)$" shell)))
 
 (defmacro exec-path-from-shell--warn-duration (&rest body)
   "Evaluate BODY and warn if execution duration exceeds a time limit.
@@ -188,6 +193,44 @@ shell-escaped, so they may contain $ etc."
           (match-string 1)
         (error "Expected printf output from shell, but got: %S" (buffer-string))))))
 
+(defun exec-path-from-shell-getenvs--nushell (names)
+  "Use nushell to get the value of env vars with the given NAMES.
+
+Execute the shell according to `exec-path-from-shell-arguments'.
+The result is a list of (NAME . VALUE) pairs."
+  (let* ((shell (exec-path-from-shell--shell))
+         (expr (format "[ %s ] | to json"
+                       (string-join
+                        (mapcar (lambda (name)
+                                  (format "$env.%s?" (exec-path-from-shell--double-quote name)))
+                                names)
+                        ", ")))
+         (shell-args (append exec-path-from-shell-arguments (list "-c" expr))))
+    (with-temp-buffer
+      (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
+      (let ((exit-code (exec-path-from-shell--warn-duration
+                        (apply #'call-process shell nil t nil shell-args))))
+        (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
+        (unless (zerop exit-code)
+          (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
+                 shell shell-args (buffer-string))))
+      (goto-char (point-min))
+      (let ((json-array-type 'list)
+            (json-null :null))
+        (let ((values (json-read-array))
+              result)
+          (while values
+            (let ((value (car values)))
+              (push (cons (car names)
+                          (unless (eq :null value)
+                            (if (listp value)
+                                (string-join value path-separator)
+                              value)))
+                    result))
+            (setq values (cdr values)
+                  names (cdr names)))
+          result)))))
+
 (defun exec-path-from-shell-getenvs (names)
   "Get the environment variables with NAMES from the user's shell.
 
@@ -195,22 +238,24 @@ Execute the shell according to `exec-path-from-shell-arguments'.
 The result is a list of (NAME . VALUE) pairs."
   (when (file-remote-p default-directory)
     (error "You cannot run exec-path-from-shell from a remote buffer (Tramp, etc.)"))
-  (let* ((random-default (md5 (format "%s%s%s" (emacs-pid) (random) (current-time))))
-         (dollar-names (mapcar (lambda (n) (format "${%s-%s}" n random-default)) names))
-         (values (split-string (exec-path-from-shell-printf
-                                (mapconcat #'identity (make-list (length names) "%s") "\\000")
-                                dollar-names) "\0")))
-    (let (result)
-      (while names
-        (prog1
-            (let ((value (car values)))
-              (push (cons (car names)
-                          (unless (string-equal random-default value)
-                            value))
-                    result))
-          (setq values (cdr values)
-                names (cdr names))))
-      result)))
+  (if (exec-path-from-shell--nushell-p (exec-path-from-shell--shell))
+      (exec-path-from-shell-getenvs--nushell names)
+    (let* ((random-default (md5 (format "%s%s%s" (emacs-pid) (random) (current-time))))
+           (dollar-names (mapcar (lambda (n) (format "${%s-%s}" n random-default)) names))
+           (values (split-string (exec-path-from-shell-printf
+                                  (mapconcat #'identity (make-list (length names) "%s") "\\000")
+                                  dollar-names) "\0")))
+      (let (result)
+        (while names
+          (prog1
+              (let ((value (car values)))
+                (push (cons (car names)
+                            (unless (string-equal random-default value)
+                              value))
+                      result))
+            (setq values (cdr values)
+                  names (cdr names))))
+        result))))
 
 (defun exec-path-from-shell-getenv (name)
   "Get the environment variable NAME from the user's shell.
