@@ -157,6 +157,26 @@ The limit is given by `exec-path-from-shell-warn-duration-millis'."
                (message "Warning: exec-path-from-shell execution took %dms. See the README for tips on reducing this." ,duration-millis)
              (exec-path-from-shell--debug "Shell execution took %dms" ,duration-millis)))))))
 
+(defun exec-path-from-shell--call-process-with-clean-env (program &optional infile destination display &rest args)
+  "Call PROGRAM with a completely clean environment.
+
+This function is a thin wrapper around `call-process'.
+It binds `process-environment' to an empty list so that no inherited
+environment variables from Emacs (e.g. PATH, LANG)
+ are passed to the subprocess.
+
+Arguments are the same as for `call-process':
+
+  PROGRAM     — the executable to run (string)
+  INFILE      — nil, t, or a file name for standard input
+  DESTINATION — nil, t, or a buffer/file for standard output
+  DISPLAY     — if non-nil, redisplay buffer as output is inserted
+  ARGS        — additional arguments passed to PROGRAM
+
+Returns the exit code of the called process."
+  (let ((process-environment nil))
+    (apply #'call-process program infile destination display args)))
+
 (defun exec-path-from-shell-printf (str &optional args)
   "Return the result of printing STR in the user's shell.
 
@@ -183,7 +203,7 @@ shell-escaped, so they may contain $ etc."
     (with-temp-buffer
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
       (let ((exit-code (exec-path-from-shell--warn-duration
-                        (apply #'call-process shell nil t nil shell-args))))
+                        (apply #'exec-path-from-shell--call-process-with-clean-env shell nil t nil shell-args))))
         (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
         (unless (zerop exit-code)
           (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
@@ -209,7 +229,7 @@ The result is a list of (NAME . VALUE) pairs."
     (with-temp-buffer
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
       (let ((exit-code (exec-path-from-shell--warn-duration
-                        (apply #'call-process shell nil t nil shell-args))))
+                        (apply #'exec-path-from-shell--call-process-with-clean-env shell nil t nil shell-args))))
         (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
         (unless (zerop exit-code)
           (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
