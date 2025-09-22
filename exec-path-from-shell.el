@@ -197,7 +197,12 @@ shell-escaped, so they may contain $ etc."
   "Use nushell to get the value of env vars with the given NAMES.
 
 Execute the shell according to `exec-path-from-shell-arguments'.
-The result is a list of (NAME . VALUE) pairs."
+The result is a list of (NAME . VALUE) pairs.
+
+Nushell sometimes produces output like e.g. flag deprecation warnings.
+These messages are written to an error buffer (*exec-path-from-shell:
+nushell errors*); unless Nushell produces a non-zero exit code, this
+buffer is left undisplayed."
   (let* ((shell (exec-path-from-shell--shell))
          (expr (format "[ %s ] | to json"
                        (string-join
@@ -205,15 +210,21 @@ The result is a list of (NAME . VALUE) pairs."
                                   (format "$env.%s?" (exec-path-from-shell--double-quote name)))
                                 names)
                         ", ")))
-         (shell-args (append exec-path-from-shell-arguments (list "-c" expr))))
+         (shell-args (append exec-path-from-shell-arguments (list "-c" expr)))
+         (err-buff-name "*exec-path-from-shell: nushell errors*")
+         (err-file (make-temp-file err-buff-name)))
     (with-temp-buffer
+      (kill-buffer err-buff-name)
       (exec-path-from-shell--debug "Invoking shell %s with args %S" shell shell-args)
       (let ((exit-code (exec-path-from-shell--warn-duration
-                        (apply #'call-process shell nil t nil shell-args))))
+                        (apply #'call-process shell nil '(t err-file) nil shell-args)))
+            (err-buff (generate-new-buffer err-buff-name)))
         (exec-path-from-shell--debug "Shell printed: %S" (buffer-string))
+        (with-current-buffer err-buff (insert-file-contents err-file))
         (unless (zerop exit-code)
           (error "Non-zero exit code from shell %s invoked with args %S.  Output was:\n%S"
-                 shell shell-args (buffer-string))))
+                 shell shell-args (buffer-string))
+          (display-buffer err-buff)))
       (goto-char (point-min))
       (let ((json-array-type 'list)
             (json-null :null))
