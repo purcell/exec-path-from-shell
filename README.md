@@ -42,6 +42,11 @@ If you experience issues, enable the variable
 this will produce detailed logging in `*Messages*` about the shell
 command line and output.
 
+There is a [compatible
+package](https://github.com/timfel/exec-path-from-powershell) if you are using
+`powershell` or `pwsh` so you can share Emacs config with platforms that use
+that shell.
+
 ## Installation
 
 Installable packages are available via MELPA:  do
